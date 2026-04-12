@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>04 Chapter 3 - 实战解法 | AI 产品经理面试作品</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0',
+                            300: '#cbd5e1', 400: '#94a3b8', 500: '#64748b',
+                            600: '#475569', 700: '#334155', 800: '#1e293b', 900: '#0f172a',
+                        },
+                        blue: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb' },
+                        purple: { 50: '#faf5ff', 100: '#f3e8ff', 500: '#a855f7', 600: '#9333ea' },
+                        green: { 50: '#f0fdf4', 100: '#dcfce7', 500: '#22c55e', 600: '#16a34a' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes flow {
+            0% { offset-distance: 0%; }
+            100% { offset-distance: 100%; }
+        }
+        @keyframes slideDown {
+            from { opacity: 0; max-height: 0; transform: translateY(-10px); }
+            to { opacity: 1; max-height: 1000px; transform: translateY(0); }
+        }
+        @keyframes slideUp {
+            from { opacity: 1; max-height: 1000px; transform: translateY(0); }
+            to { opacity: 0; max-height: 0; transform: translateY(-10px); }
+        }
+        @keyframes moveAlongPath {
+            0% { offset-distance: 0%; }
+            100% { offset-distance: 100%; }
+        }
+        .animate-fade-in-up { animation: fadeInUp 0.6s ease-out forwards; }
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+
+        .flywheel {
+            animation: rotate 10s linear infinite;
+        }
+        .flywheel-counter {
+            animation: rotate 10s linear infinite reverse;
+        }
+        .step-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .step-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .step-content {
+            overflow: hidden;
+            transition: max-height 0.4s ease-out, opacity 0.4s ease-out;
+            max-height: 0;
+            opacity: 0;
+        }
+        .step-content.expanded {
+            max-height: 1000px;
+            opacity: 1;
+        }
+        .chevron {
+            transition: transform 0.3s ease;
+        }
+        .chevron.rotated {
+            transform: rotate(180deg);
+        }
+        .problem-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .problem-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        /* Data flow particles - rotating along the ring */
+        .particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+        }
+        .particle-container {
+            position: relative;
+            width: 160px;
+            height: 160px;
+        }
+        /* Flywheel rotation animation */
+        .flywheel {
+            animation: rotate 10s linear infinite;
+        }
+    </style>
+</head>
+<body class="bg-white min-h-screen">
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="text-slate-900 font-bold text-xl">AI PM Portfolio</div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#" class="text-slate-600 hover:text-slate-900 transition-colors">问题洞察</a>
+                    <a href="#" class="text-slate-600 hover:text-slate-900 transition-colors">四个真问题</a>
+                    <a href="#" class="text-blue-600 font-medium">实战解法</a>
+                    <a href="#" class="text-slate-600 hover:text-slate-900 transition-colors">结果数据</a>
+                    <a href="#" class="text-slate-600 hover:text-slate-900 transition-colors">认知沉淀</a>
+                    <a href="#" class="text-slate-600 hover:text-slate-900 transition-colors">能力映射</a>
+                    <a href="#" class="text-slate-600 hover:text-slate-900 transition-colors">可迁移性</a>
+                </div>
+                <button class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg transition-colors">下载简历</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="min-h-screen px-6 py-32 max-w-7xl mx-auto">
+        <!-- Chapter Header -->
+        <div class="text-center mb-16">
+            <span class="text-blue-600 font-semibold text-sm tracking-wider uppercase">Chapter 03</span>
+            <h1 class="text-slate-900 text-3xl sm:text-4xl lg:text-5xl font-bold mt-4 max-w-4xl mx-auto">
+                我的实战解法
+            </h1>
+            <p class="text-slate-600 text-lg mt-6 max-w-3xl mx-auto leading-relaxed">
+                企业内部上 Agent，最忌讳一上来就想搞全面覆盖。<br/>
+                我的做法是：找到最高频、多角色参与的决策链，从这一个点切进去。
+            </p>
+        </div>
+
+        <!-- Three Steps Flow -->
+        <div class="animate-fade-in-up mb-20">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Step 1 -->
+                <div class="relative">
+                    <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-8 text-center">
+                        <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-blue-900 text-xl font-bold mb-2">Step 1</h3>
+                        <p class="text-blue-700 font-medium">找切入点</p>
+                        <p class="text-blue-600 text-sm mt-1">决策链路地图</p>
+                    </div>
+                    <!-- Arrow -->
+                    <div class="hidden md:block absolute top-1/2 -right-4 transform -translate-y-1/2 z-10">
+                        <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="relative">
+                    <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-8 text-center">
+                        <div class="w-16 h-16 bg-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-purple-900 text-xl font-bold mb-2">Step 2</h3>
+                        <p class="text-purple-700 font-medium">挖规则</p>
+                        <p class="text-purple-600 text-sm mt-1">三层挖掘法</p>
+                    </div>
+                    <!-- Arrow -->
+                    <div class="hidden md:block absolute top-1/2 -right-4 transform -translate-y-1/2 z-10">
+                        <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div>
+                    <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-8 text-center">
+                        <div class="w-16 h-16 bg-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-green-900 text-xl font-bold mb-2">Step 3</h3>
+                        <p class="text-green-700 font-medium">建飞轮</p>
+                        <p class="text-green-600 text-sm mt-1">双飞轮机制</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 1 Detail -->
+        <div class="animate-fade-in-up delay-100">
+            <div class="step-card bg-slate-50 rounded-2xl" onclick="toggleStep('step1')">
+                <div class="flex items-center justify-between p-8 lg:p-10 cursor-pointer">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">1</div>
+                        <h2 class="text-slate-900 text-2xl font-bold">找对切入点——不做大而全，只切最高频的决策链</h2>
+                    </div>
+                    <svg id="step1-chevron" class="chevron w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+
+                <div id="step1-content" class="step-content">
+                    <div class="px-8 lg:px-10 pb-8 lg:pb-10">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Before -->
+                            <div class="bg-white rounded-xl p-6 border border-slate-200">
+                                <h3 class="text-slate-700 font-semibold mb-4 flex items-center gap-2">
+                                    <span class="w-2 h-2 bg-slate-400 rounded-full"></span>
+                                    Before: 立项决策涉及的角色和系统（分散、断点多）
+                                </h3>
+                                <div class="space-y-2 text-sm">
+                                    <div class="flex items-center gap-2"><span class="text-slate-400">•</span><span>战略部 → 战略系统</span></div>
+                                    <div class="flex items-center gap-2"><span class="text-slate-400">•</span><span>市场部 → CRM 系统</span></div>
+                                    <div class="flex items-center gap-2"><span class="text-slate-400">•</span><span>财务部 → 预算系统</span></div>
+                                    <div class="flex items-center gap-2"><span class="text-slate-400">•</span><span>人力部 → 资源系统</span></div>
+                                    <div class="flex items-center gap-2"><span class="text-slate-400">•</span><span>项目组 → 项目管理系统</span></div>
+                                    <div class="flex items-center gap-2"><span class="text-slate-400">•</span><span>审批流 → OA 审批系统</span></div>
+                                </div>
+                            </div>
+
+                            <!-- After -->
+                            <div class="bg-blue-50 rounded-xl p-6 border border-blue-200">
+                                <h3 class="text-blue-900 font-semibold mb-4 flex items-center gap-2">
+                                    <span class="w-2 h-2 bg-blue-600 rounded-full"></span>
+                                    After: AI 作为中枢，统一调度
+                                </h3>
+                                <div class="flex items-center justify-center gap-2 text-sm">
+                                    <div class="bg-blue-600 text-white px-3 py-2 rounded-lg font-medium">AI Agent</div>
+                                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                                    </svg>
+                                    <div class="bg-blue-200 text-blue-800 px-3 py-2 rounded-lg font-medium">跨系统数据整合</div>
+                                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                                    </svg>
+                                    <div class="bg-blue-600 text-white px-3 py-2 rounded-lg font-medium">统一决策输出</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- My Actions -->
+                        <div class="mt-6 bg-white rounded-xl p-6 border border-blue-100">
+                            <h4 class="text-blue-900 font-semibold mb-3">我的具体工作：</h4>
+                            <ul class="space-y-2 text-sm text-slate-700">
+                                <li class="flex items-start gap-2">
+                                    <svg class="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span>绘制了完整的决策链路地图，识别出关键决策节点</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <svg class="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span>访谈了多个角色的关键人员，理解决策依赖的信息来源</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <svg class="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span>梳理出多个系统的数据接口，明确数据可得性和质量</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2 Detail -->
+        <div class="animate-fade-in-up delay-200">
+            <div class="step-card bg-slate-50 rounded-2xl" onclick="toggleStep('step2')">
+                <div class="flex items-center justify-between p-8 lg:p-10 cursor-pointer">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">2</div>
+                        <h2 class="text-slate-900 text-2xl font-bold">挖掘隐性规则——把"人脑里的经验"变成"AI 能用的框架"</h2>
+                    </div>
+                    <svg id="step2-chevron" class="chevron w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+
+                <div id="step2-content" class="step-content">
+                    <div class="px-8 lg:px-10 pb-8 lg:pb-10">
+                        <!-- Three Layer Method -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            <div class="bg-white rounded-xl p-6 border border-slate-200">
+                                <div class="text-purple-600 font-bold text-sm mb-2">第一层</div>
+                                <h3 class="text-slate-900 font-bold mb-3">数据分析</h3>
+                                <ul class="space-y-2 text-sm text-slate-600">
+                                    <li class="flex items-start gap-2"><span class="text-purple-500">•</span><span>分析历史立项项目，提取决策模式</span></li>
+                                    <li class="flex items-start gap-2"><span class="text-purple-500">•</span><span>识别通过 vs 驳回项目的关键差异因子</span></li>
+                                </ul>
+                            </div>
+                            <div class="bg-white rounded-xl p-6 border border-slate-200">
+                                <div class="text-purple-600 font-bold text-sm mb-2">第二层</div>
+                                <h3 class="text-slate-900 font-bold mb-3">深度访谈</h3>
+                                <ul class="space-y-2 text-sm text-slate-600">
+                                    <li class="flex items-start gap-2"><span class="text-purple-500">•</span><span>访谈战略/财务/人力/业务专家</span></li>
+                                    <li class="flex items-start gap-2"><span class="text-purple-500">•</span><span>用"决策日志法"还原判断过程</span></li>
+                                </ul>
+                            </div>
+                            <div class="bg-white rounded-xl p-6 border border-slate-200">
+                                <div class="text-purple-600 font-bold text-sm mb-2">第三层</div>
+                                <h3 class="text-slate-900 font-bold mb-3">共创验证</h3>
+                                <ul class="space-y-2 text-sm text-slate-600">
+                                    <li class="flex items-start gap-2"><span class="text-purple-500">•</span><span>组织跨角色工作坊</span></li>
+                                    <li class="flex items-start gap-2"><span class="text-purple-500">•</span><span>用真实案例验证规则的覆盖率和准确率</span></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Outputs -->
+                        <div class="bg-purple-50 rounded-xl p-6">
+                            <h3 class="text-purple-900 font-bold mb-3">输出产物：</h3>
+                            <ul class="space-y-2 text-sm text-purple-800">
+                                <li class="flex items-start gap-2"><span class="text-purple-600">✓</span><span>《项目立项决策框架 v1.0》—— 包含决策规则</span></li>
+                                <li class="flex items-start gap-2"><span class="text-purple-600">✓</span><span>上下文组装规范——明确信息来源、优先级、冲突处理逻辑</span></li>
+                                <li class="flex items-start gap-2"><span class="text-purple-600">✓</span><span>跨系统数据映射表——系统、字段的映射关系</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3 Detail: Flywheels -->
+        <div class="animate-fade-in-up delay-300">
+            <div class="step-card bg-gradient-to-br from-green-50 to-blue-50 rounded-2xl" onclick="toggleStep('step3')">
+                <div class="flex items-center justify-between p-8 lg:p-10 cursor-pointer">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">3</div>
+                        <h2 class="text-slate-900 text-2xl font-bold">建两个数据飞轮——准确率从 40% 到 90%+ 的关键</h2>
+                    </div>
+                    <svg id="step3-chevron" class="chevron w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+
+                <div id="step3-content" class="step-content">
+                    <div class="px-8 lg:px-10 pb-8 lg:pb-10">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <!-- Flywheel 1: Rule Self-Evolution -->
+                            <div class="bg-white rounded-xl p-6 border border-green-200 flywheel-container">
+                                <h3 class="text-green-700 font-bold text-lg mb-4 flex items-center gap-2">
+                                    <svg class="w-6 h-6 flywheel" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                    </svg>
+                                    飞轮一：规则自进化（Skill 机制）
+                                </h3>
+                                <p class="text-green-600 text-sm mb-4">让 Agent 的工作规则不是写死的，而是能根据反馈自动升级的。</p>
+
+                                <!-- Loop Diagram with Particles and Labels -->
+                                <div class="relative h-48 mb-4">
+                                    <!-- Outer ring -->
+                                    <div class="absolute inset-0 flex items-center justify-center">
+                                        <div class="w-40 h-40 border-4 border-green-200 rounded-full"></div>
+                                    </div>
+                                    <!-- Center text -->
+                                    <div class="absolute inset-0 flex items-center justify-center">
+                                        <div class="text-center bg-white px-4 py-2 rounded-full z-10">
+                                            <div class="text-green-600 text-lg font-bold">持续优化</div>
+                                        </div>
+                                    </div>
+                                    <!-- Rotating particles only -->
+                                    <div class="absolute inset-0 flex items-center justify-center">
+                                        <div class="w-40 h-40 rounded-full flywheel">
+                                            <!-- Particles on the ring -->
+                                            <div class="particle absolute" style="top: -4px; left: 50%; transform: translateX(-50%);"></div>
+                                            <div class="particle absolute" style="bottom: -4px; left: 50%; transform: translateX(-50%);"></div>
+                                            <div class="particle absolute" style="top: 50%; left: -4px; transform: translateY(-50%);"></div>
+                                            <div class="particle absolute" style="top: 50%; right: -4px; transform: translateY(-50%);"></div>
+                                        </div>
+                                    </div>
+                                    <!-- Fixed labels at top/bottom/left/right -->
+                                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                        <!-- Top label -->
+                                        <div class="absolute" style="top: 16px; left: 50%; transform: translate(-50%, -100%);">
+                                            <span class="text-xs text-green-700 font-medium bg-white/90 px-2 py-0.5 rounded">AI 产出</span>
+                                        </div>
+                                        <!-- Bottom label -->
+                                        <div class="absolute" style="bottom: 16px; left: 50%; transform: translate(-50%, 100%);">
+                                            <span class="text-xs text-green-700 font-medium bg-white/90 px-2 py-0.5 rounded">全量发布</span>
+                                        </div>
+                                        <!-- Left label -->
+                                        <div class="absolute" style="left: 175px; top: 50%; transform: translate(-100%, -50%);">
+                                            <span class="text-xs text-green-700 font-medium bg-white/90 px-2 py-0.5 rounded whitespace-nowrap">用户反馈</span>
+                                        </div>
+                                        <!-- Right label -->
+                                        <div class="absolute" style="right: 175px; top: 50%; transform: translate(100%, -50%);">
+                                            <span class="text-xs text-green-700 font-medium bg-white/90 px-2 py-0.5 rounded whitespace-nowrap">A/B 测试</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Metrics -->
+                                <div class="grid grid-cols-2 gap-3 mb-4">
+                                    <div class="bg-green-50 rounded-lg p-3 text-center border-2 border-green-200">
+                                        <div class="text-green-600 text-xl font-bold">≥90%</div>
+                                        <div class="text-green-700 text-xs">准确率</div>
+                                    </div>
+                                    <div class="bg-green-50 rounded-lg p-3 text-center border-2 border-green-200">
+                                        <div class="text-green-600 text-xl font-bold">≥95%</div>
+                                        <div class="text-green-700 text-xs">完整率</div>
+                                    </div>
+                                    <div class="bg-green-50 rounded-lg p-3 text-center border-2 border-green-200">
+                                        <div class="text-green-600 text-xl font-bold">≥80%</div>
+                                        <div class="text-green-700 text-xs">采纳率</div>
+                                    </div>
+                                    <div class="bg-green-50 rounded-lg p-3 text-center border-2 border-green-200">
+                                        <div class="text-green-600 text-xl font-bold">≤20%</div>
+                                        <div class="text-green-700 text-xs">修正率</div>
+                                    </div>
+                                </div>
+
+                                <!-- Feedback Sources -->
+                                <div class="bg-green-50 rounded-lg p-4">
+                                    <h4 class="text-green-800 font-semibold text-sm mb-2">反馈来源：</h4>
+                                    <ul class="space-y-1 text-xs text-green-700">
+                                        <li class="flex items-start gap-2"><span class="text-green-600">•</span><span>显性反馈：用户对每次 AI 产出打分（1-5 星）+ 文字评价</span></li>
+                                        <li class="flex items-start gap-2"><span class="text-green-600">•</span><span>隐性反馈：用户是否直接采用、是否修改、修改幅度</span></li>
+                                        <li class="flex items-start gap-2"><span class="text-green-600">•</span><span>专家复核：每周抽取案例由领域专家做深度评估</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Flywheel 2: Project Memory Pool -->
+                            <div class="bg-white rounded-xl p-6 border border-blue-200 flywheel-container">
+                                <h3 class="text-blue-700 font-bold text-lg mb-4 flex items-center gap-2">
+                                    <svg class="w-6 h-6 flywheel-counter" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                                    </svg>
+                                    飞轮二：项目经验池（Memory 机制）
+                                </h3>
+                                <p class="text-blue-600 text-sm mb-4">同一个项目，AI 处理得越多，对这个项目就越了解，准确率就越高。</p>
+
+                                <!-- Memory Layers -->
+                                <div class="space-y-3 mb-6">
+                                    <div class="bg-blue-50 rounded-lg p-4 border-l-4 border-blue-400">
+                                        <div class="text-blue-700 font-bold text-sm mb-1">L1 项目基础信息（静态）</div>
+                                        <div class="text-blue-600 text-xs">项目目标、范围、预算、团队、战略契合度、优先级</div>
+                                    </div>
+                                    <div class="bg-blue-100 rounded-lg p-4 border-l-4 border-blue-500">
+                                        <div class="text-blue-800 font-bold text-sm mb-1">L2 过程记忆（动态累积）</div>
+                                        <div class="text-blue-700 text-xs">历史决策记录、用户纠正/确认的行为、特殊规则和例外情况</div>
+                                    </div>
+                                    <div class="bg-blue-200 rounded-lg p-4 border-l-4 border-blue-600">
+                                        <div class="text-blue-900 font-bold text-sm mb-1">L3 模式识别（AI 提炼）</div>
+                                        <div class="text-blue-800 text-xs">从历史数据中自动识别的决策模式、高风险信号预警</div>
+                                    </div>
+                                </div>
+
+                                <!-- Retrieval Strategy -->
+                                <div class="bg-blue-50 rounded-lg p-4 mb-4">
+                                    <h4 class="text-blue-800 font-semibold text-sm mb-2">记忆检索策略：</h4>
+                                    <ul class="space-y-1 text-xs text-blue-700">
+                                        <li class="flex items-start gap-2"><span class="text-blue-600">•</span><span>基于语义相似度检索相关记忆</span></li>
+                                        <li class="flex items-start gap-2"><span class="text-blue-600">•</span><span>基于时间衰减，近期记忆权重更高</span></li>
+                                        <li class="flex items-start gap-2"><span class="text-blue-600">•</span><span>基于置信度，专家确认的记忆权重更高</span></li>
+                                    </ul>
+                                </div>
+
+                                <div class="text-center text-blue-700 text-sm font-medium bg-blue-50 rounded-lg p-3">
+                                    AI 对每个项目的理解像滚雪球一样越滚越大，准确率持续攀升。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transition CTA -->
+        <div class="animate-fade-in-up text-center">
+            <a href="#" class="inline-flex items-center gap-2 text-blue-600 font-medium hover:text-blue-700 transition-colors cursor-pointer">
+                继续看结果数据
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                </svg>
+            </a>
+        </div>
+    </main>
+
+    <script>
+        // Intersection Observer for animations
+        const observerOptions = { threshold: 0.1 };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationPlayState = 'running';
+                }
+            });
+        }, observerOptions);
+        document.querySelectorAll('.animate-fade-in-up').forEach(el => observer.observe(el));
+
+        // Step card toggle functionality
+        function toggleStep(stepId) {
+            const content = document.getElementById(`${stepId}-content`);
+            const chevron = document.getElementById(`${stepId}-chevron`);
+            const card = content.parentElement;
+
+            if (!content || !chevron) return;
+
+            const isExpanded = content.classList.contains('expanded');
+
+            if (isExpanded) {
+                // Close this card
+                content.classList.remove('expanded');
+                chevron.classList.remove('rotated');
+                card.style.boxShadow = 'none';
+            } else {
+                // Close all other cards first
+                document.querySelectorAll('.step-content.expanded').forEach(el => {
+                    el.classList.remove('expanded');
+                    const otherChevron = el.parentElement.querySelector('.chevron');
+                    if (otherChevron) otherChevron.classList.remove('rotated');
+                    el.parentElement.style.boxShadow = 'none';
+                });
+
+                // Open this card
+                content.classList.add('expanded');
+                chevron.classList.add('rotated');
+                card.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1)';
+            }
+        }
+
+        // Auto-expand first step on load for better UX
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                toggleStep('step1');
+            }, 500);
+        });
+    </script>
+</body>
+</html>
