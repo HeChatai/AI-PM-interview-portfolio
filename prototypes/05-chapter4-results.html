@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>05 Chapter 4 - 结果数据 | AI 产品经理面试作品</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0',
+                            300: '#cbd5e1', 400: '#94a3b8', 500: '#64748b',
+                            600: '#475569', 700: '#334155', 800: '#1e293b', 900: '#0f172a',
+                        },
+                        blue: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb' },
+                        green: { 50: '#f0fdf4', 100: '#dcfce7', 500: '#22c55e', 600: '#16a34a' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up { animation: fadeInUp 0.6s ease-out forwards; }
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+
+        .metric-card {
+            transition: all 0.3s ease;
+        }
+        .metric-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="text-slate-900 font-bold text-xl">AI PM Portfolio</div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#" class="text-slate-600 hover:text-slate-900 transition-colors">问题洞察</a>
+                    <a href="#" class="text-slate-600 hover:text-slate-900 transition-colors">四个真问题</a>
+                    <a href="#" class="text-slate-600 hover:text-slate-900 transition-colors">实战解法</a>
+                    <a href="#" class="text-blue-600 font-medium">结果数据</a>
+                    <a href="#" class="text-slate-600 hover:text-slate-900 transition-colors">认知沉淀</a>
+                    <a href="#" class="text-slate-600 hover:text-slate-900 transition-colors">能力映射</a>
+                    <a href="#" class="text-slate-600 hover:text-slate-900 transition-colors">可迁移性</a>
+                </div>
+                <button class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg transition-colors">下载简历</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="min-h-screen px-6 py-32 max-w-7xl mx-auto">
+        <!-- Chapter Header -->
+        <div class="text-center mb-16">
+            <span class="text-blue-600 font-semibold text-sm tracking-wider uppercase">Chapter 04</span>
+            <h1 class="text-slate-900 text-3xl sm:text-4xl lg:text-5xl font-bold mt-4 max-w-4xl mx-auto">
+                最终结果
+            </h1>
+            <p class="text-slate-600 text-lg mt-6 max-w-3xl mx-auto">
+                从 2025 年 3 月启动，6 月跑通首个完整 MVP，此后持续迭代。
+            </p>
+        </div>
+
+        <!-- Accuracy Chart -->
+        <div class="animate-fade-in-up bg-white rounded-2xl p-8 lg:p-12 mb-12 shadow-sm">
+            <h2 class="text-slate-900 text-2xl font-bold text-center mb-8">核心场景 AI 准确率提升曲线</h2>
+            <div class="h-80">
+                <canvas id="accuracyChart"></canvas>
+            </div>
+            <!-- Milestones -->
+            <div class="grid grid-cols-3 gap-4 mt-8">
+                <div class="text-center">
+                    <div class="w-3 h-3 bg-green-500 rounded-full mx-auto mb-2"></div>
+                    <div class="text-slate-600 text-sm font-medium">2025.3</div>
+                    <div class="text-slate-500 text-xs">项目启动</div>
+                </div>
+                <div class="text-center">
+                    <div class="w-3 h-3 bg-green-500 rounded-full mx-auto mb-2"></div>
+                    <div class="text-slate-600 text-sm font-medium">2025.6</div>
+                    <div class="text-slate-500 text-xs">首个 MVP</div>
+                </div>
+                <div class="text-center">
+                    <div class="w-3 h-3 bg-green-500 rounded-full mx-auto mb-2"></div>
+                    <div class="text-slate-600 text-sm font-medium">2025.8</div>
+                    <div class="text-slate-500 text-xs">准确率 90%+</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metrics Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+
+            <!-- Metric 1: Accuracy -->
+            <div class="metric-card animate-fade-in-up delay-100 bg-white rounded-2xl p-8 shadow-sm border border-green-200">
+                <div class="text-slate-600 text-sm font-medium mb-4">核心场景 AI 准确率</div>
+                <div class="flex items-end gap-3 mb-2">
+                    <div class="text-slate-400 text-3xl font-bold">40%</div>
+                    <svg class="w-6 h-6 text-green-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                    </svg>
+                    <div class="text-green-600 text-5xl font-bold">90%+</div>
+                </div>
+                <div class="inline-block bg-green-50 text-green-700 px-3 py-1 rounded-full text-sm font-medium mb-4">
+                    +50pp 提升
+                </div>
+                <p class="text-slate-500 text-sm">AI 产出与专家判断一致的比例</p>
+            </div>
+
+            <!-- Metric 2: Automation -->
+            <div class="metric-card animate-fade-in-up delay-100 bg-white rounded-2xl p-8 shadow-sm border border-green-200">
+                <div class="text-slate-600 text-sm font-medium mb-4">自动处理管理节点</div>
+                <div class="flex items-end gap-3 mb-2">
+                    <div class="text-slate-400 text-3xl font-bold">0 层</div>
+                    <svg class="w-6 h-6 text-green-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                    </svg>
+                    <div class="text-green-600 text-5xl font-bold">6 层+</div>
+                </div>
+                <div class="inline-block bg-green-50 text-green-700 px-3 py-1 rounded-full text-sm font-medium mb-4">
+                    +6 层 自动化
+                </div>
+                <p class="text-slate-500 text-sm">管理决策节点已由 AI 稳定自动处理</p>
+            </div>
+
+            <!-- Metric 3: Time -->
+            <div class="metric-card animate-fade-in-up delay-100 bg-white rounded-2xl p-8 shadow-sm border border-green-200">
+                <div class="text-slate-600 text-sm font-medium mb-4">立项前置分析时间</div>
+                <div class="flex items-end gap-3 mb-2">
+                    <div class="text-slate-400 text-3xl font-bold">3 人日</div>
+                    <svg class="w-6 h-6 text-green-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                    </svg>
+                    <div class="text-green-600 text-4xl font-bold">1 小时</div>
+                </div>
+                <div class="inline-block bg-green-50 text-green-700 px-3 py-1 rounded-full text-sm font-medium mb-4">
+                    24x 效率提升
+                </div>
+                <p class="text-slate-500 text-sm">从背景调研、行业分析到表单填写的全流程</p>
+            </div>
+
+            <!-- Metric 4: Pass Rate -->
+            <div class="metric-card animate-fade-in-up delay-200 bg-white rounded-2xl p-8 shadow-sm border border-green-200">
+                <div class="text-slate-600 text-sm font-medium mb-4">立项通过率</div>
+                <div class="flex items-end gap-3 mb-2">
+                    <div class="text-slate-400 text-3xl font-bold">60%</div>
+                    <svg class="w-6 h-6 text-green-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                    </svg>
+                    <div class="text-green-600 text-5xl font-bold">90%+</div>
+                </div>
+                <div class="inline-block bg-green-50 text-green-700 px-3 py-1 rounded-full text-sm font-medium mb-4">
+                    +30pp 提升
+                </div>
+                <p class="text-slate-500 text-sm">通过 AI 辅助分析后的立项通过率</p>
+            </div>
+
+            <!-- Metric 5: Efficiency -->
+            <div class="metric-card animate-fade-in-up delay-200 bg-white rounded-2xl p-8 shadow-sm border border-green-200">
+                <div class="text-slate-600 text-sm font-medium mb-4">单人管理项目数</div>
+                <div class="flex items-end gap-3 mb-2">
+                    <div class="text-slate-400 text-3xl font-bold">2 个</div>
+                    <svg class="w-6 h-6 text-green-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                    </svg>
+                    <div class="text-green-600 text-4xl font-bold">5-6 个</div>
+                </div>
+                <div class="inline-block bg-green-50 text-green-700 px-3 py-1 rounded-full text-sm font-medium mb-4">
+                    300% 人效提升
+                </div>
+                <p class="text-slate-500 text-sm">项目负责人同时管理的项目数量</p>
+            </div>
+
+            <!-- Metric 6: Quality -->
+            <div class="metric-card animate-fade-in-up delay-200 bg-white rounded-2xl p-8 shadow-sm border border-green-200">
+                <div class="text-slate-600 text-sm font-medium mb-4">交付质量</div>
+                <div class="flex items-end gap-3 mb-2">
+                    <div class="text-slate-400 text-3xl font-bold">基准</div>
+                    <svg class="w-6 h-6 text-green-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <div class="text-green-600 text-4xl font-bold">稳定</div>
+                </div>
+                <div class="inline-block bg-green-50 text-green-700 px-3 py-1 rounded-full text-sm font-medium mb-4">
+                    质量稳定
+                </div>
+                <p class="text-slate-500 text-sm">人效提升的同时交付质量保持稳定</p>
+            </div>
+
+        </div>
+
+        <!-- Summary -->
+        <div class="animate-fade-in-up delay-300 bg-gradient-to-r from-green-50 to-blue-50 rounded-2xl p-8 lg:p-12 text-center">
+            <p class="text-slate-700 text-lg leading-relaxed">
+                这套方法被复用到公司其他 AI 化项目中，并被多个团队借鉴。
+            </p>
+        </div>
+
+        <!-- Transition CTA -->
+        <div class="animate-fade-in-up text-center mt-12">
+            <a href="#" class="inline-flex items-center gap-2 text-blue-600 font-medium hover:text-blue-700 transition-colors cursor-pointer">
+                继续看认知沉淀
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                </svg>
+            </a>
+        </div>
+    </main>
+
+    <script>
+        // Chart.js Configuration
+        const ctx = document.getElementById('accuracyChart').getContext('2d');
+
+        // Gradient fill
+        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(34, 197, 94, 0.3)');
+        gradient.addColorStop(1, 'rgba(34, 197, 94, 0)');
+
+        const accuracyChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['2025.3', '2025.4', '2025.5', '2025.6', '2025.7', '2025.8', '持续'],
+                datasets: [{
+                    label: '准确率 (%)',
+                    data: [40, 52, 65, 72, 81, 88, 92],
+                    borderColor: '#22c55e',
+                    backgroundColor: gradient,
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 8,
+                    pointBackgroundColor: '#22c55e',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointHoverRadius: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        padding: 12,
+                        titleFont: { size: 14 },
+                        bodyFont: { size: 14 },
+                        displayColors: false,
+                        callbacks: {
+                            label: function(context) {
+                                return '准确率：' + context.parsed.y + '%';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        grid: {
+                            color: '#e2e8f0'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+
+        // Intersection Observer for animations
+        const observerOptions = { threshold: 0.1 };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationPlayState = 'running';
+                }
+            });
+        }, observerOptions);
+        document.querySelectorAll('.animate-fade-in-up').forEach(el => observer.observe(el));
+    </script>
+</body>
+</html>
